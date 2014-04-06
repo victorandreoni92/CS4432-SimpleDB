@@ -26,11 +26,6 @@ public class SampleSchema {
 			
 			Statement statement = connection.createStatement(); // Get statement
 			
-			/////////////////////// Drop Tables if Exist //////////////////////////////////////////
-			
-			//TODO Drop table if exist to avoid filling them after every run
-			// Interestingly, trying to create a table that already exists doesn't throw an error
-			
 			/////////////////////// Create and Fill Tables ////////////////////////////////////////
 			
 			// First table - Soccer teams table
@@ -83,7 +78,9 @@ public class SampleSchema {
 			results = statement.executeQuery(query);
 			
 			// Print results
-			System.out.printf("%-15s \t %-10s \t %-25s \t %-10s\n\n", "Team", "Country",
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			System.out.println("\nAll soccer teams in table");
+			System.out.printf("\n%-15s \t %-10s \t %-25s \t %-10s\n\n", "Team", "Country",
 					"Colors", "League");
 			while (results.next()) {
 				System.out.printf("%-15s \t %-10s \t %-25s \t %-10s\n", 
@@ -92,9 +89,43 @@ public class SampleSchema {
 						results.getString("Colors"),
 						results.getString("League"));
 			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
 			results.close();
 			
-			//TODO Add more queries, some of them with WHERE clauses
+			// Second query - Update information on Soccer teams and print
+			// Update value
+			query = "update SoccerTeams set Colors='Bianco e Nero' where Name='Juventus'";
+			statement.executeUpdate(query);
+			
+			// Query updated tuple
+			query = "select Name, Country, Colors, League from SoccerTeams where Name='Juventus'";
+			results = statement.executeQuery(query);
+			
+			// Print result
+			System.out.println("\nSoccer team with modified colors");
+			System.out.printf("\n%-15s \t %-10s \t %-25s \t %-10s\n\n", "Team", "Country",
+					"Colors", "League");
+			while (results.next()) {
+				System.out.printf("%-15s \t %-10s \t %-25s \t %-10s\n", 
+						results.getString("Name"),
+						results.getString("Country"),
+						results.getString("Colors"),
+						results.getString("League"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
+			
+			// Third query - Print specific tuples
+			query = "select Name from BaseballTeams where Colors='White'";
+			results = statement.executeQuery(query);
+			
+			// Print results
+			System.out.printf("\n%-15s\n\n", "Baseball teams with white uniforms");
+			while (results.next()) {
+				System.out.printf("%-15s\n", results.getString("Name"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
