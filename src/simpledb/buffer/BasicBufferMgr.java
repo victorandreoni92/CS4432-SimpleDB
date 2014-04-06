@@ -1,5 +1,6 @@
 package simpledb.buffer;
 
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 import simpledb.file.*;
@@ -8,12 +9,17 @@ import simpledb.file.*;
  * Manages the pinning and unpinning of buffers to blocks.
  * @author Edward Sciore
  *
+ * @author Modified by Team21 for CS4432 at WPI
  */
 class BasicBufferMgr {
    private Buffer[] bufferpool;
    private int numAvailable;
    //CS4432-Project1: List to store available indexes of buffers
    private LinkedList<Integer> availableBufferIndexes;
+   //CS4432-Project1: HashTable to access requested frames with blocks
+   // Key is the block number being searched, value is index into pool where
+   // corresponding buffer is located
+   private Hashtable<Block, Integer> buffersOnPool;
    
    /**
     * Creates a buffer manager having the specified number 
@@ -31,6 +37,7 @@ class BasicBufferMgr {
    BasicBufferMgr(int numbuffs) {
       bufferpool = new Buffer[numbuffs];
       availableBufferIndexes = new LinkedList<Integer>();
+      buffersOnPool = new Hashtable<Block, Integer>(numbuffs);
       numAvailable = numbuffs;
       for (int i=0; i<numbuffs; i++){
          bufferpool[i] = new Buffer(i);
@@ -65,6 +72,8 @@ class BasicBufferMgr {
          if (buff == null)
             return null;
          buff.assignToBlock(blk);
+         //CS4432-Project1: Add reference to block in table
+         buffersOnPool.put(blk, buff.getBufferPoolIndex());
       }
       if (!buff.isPinned())
          numAvailable--;
@@ -86,6 +95,8 @@ class BasicBufferMgr {
       if (buff == null)
          return null;
       buff.assignToNew(filename, fmtr);
+      //CS4432-Project1: Add reference to block in table
+      buffersOnPool.put(buff.block(), buff.getBufferPoolIndex());
       numAvailable--;
       buff.pin();
       return buff;
@@ -119,12 +130,16 @@ class BasicBufferMgr {
    
    //CS4432-Project1: Method that looks for buffer with specified disk page 
    private Buffer findExistingBuffer(Block blk) {
-      for (Buffer buff : bufferpool) {
-         Block b = buff.block();
-         if (b != null && b.equals(blk))
-            return buff;
-      }
-      return null;
+      
+	  //CS4432-Project1: Get index for buffer with blk, null if not present
+	  Integer index = buffersOnPool.get(blk);
+	  
+	  if (index != null){
+		  // If not null, return the buffer in the specified index
+		  return bufferpool[index];
+	  } else {
+		  return null;
+	  }
    }
    
    //CS4432-Project1: Method that checks for available buffers (frames)
@@ -133,17 +148,19 @@ class BasicBufferMgr {
 	  //CS4432-Project1: Get first index in list, null if list empty
 	  Integer index = availableBufferIndexes.pollFirst();
 	  
-	  if (index != null){ //CS4432-Project1: If not null, get buffer in
-		  return bufferpool[index];//specified index
+	  if (index != null){ //CS4432-Project1: If not null, get buffer in   
+	      Buffer buff = bufferpool[index];
+	      
+    	  //CS4432-Project1: Since block is being reused, remove reference
+    	  //TODO Revise this when replacement policy is implemented
+	      if (buff.block() != null){
+	    	  buffersOnPool.remove(buff.block());
+	      }
+	      
+		  return buff;
 	  } else {
 		  return null;
 	  }
    }
 }
-
-
-
-
-
-
 

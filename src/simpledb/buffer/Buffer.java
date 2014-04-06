@@ -12,6 +12,8 @@ import simpledb.file.*;
  * and if so, the id of the modifying transaction and
  * the LSN of the corresponding log record.
  * @author Edward Sciore
+ * 
+ * @author Modified by Team21 for CS4432 at WPI
  */
 public class Buffer {
    private Page contents = new Page();
@@ -54,7 +56,7 @@ public class Buffer {
     * @return index of the buffer or null if no index associated
     */
    public Integer getBufferPoolIndex(){
-	   if (bufferPoolIndex != 99){
+	   if (bufferPoolIndex != -99){
 		   return bufferPoolIndex;
 	   } else {
 		   return null;
