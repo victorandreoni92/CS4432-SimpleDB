@@ -17,6 +17,8 @@ public class Buffer {
    private Page contents = new Page();
    private Block blk = null;
    private int pins = 0;
+   //CS4432-Project1: Store index where buffer is allocated
+   private int bufferPoolIndex;
    private int modifiedBy = -1;  // negative means not modified
    private int logSequenceNumber = -1; // negative means no corresponding log record
 
@@ -34,7 +36,30 @@ public class Buffer {
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
-   public Buffer() {}
+   public Buffer() {
+	   //CS4432-Project1: If no index is specified, add signal value for index
+	   // This is most likely not necessary since the buffer constructor
+	   // is only called by BasicBufferManager, but adding it here to prevent
+	   // undocumented null errors (see getBufferPoolIndex)
+	   this(-99); 
+   }
+   
+   //CS4432-Project1: Modified constructor to add index record to buffer
+   public Buffer(int index){
+	   bufferPoolIndex = index;
+   }
+   
+   /**
+    * CS4432-Project1: Returns the index associated with the buffer
+    * @return index of the buffer or null if no index associated
+    */
+   public Integer getBufferPoolIndex(){
+	   if (bufferPoolIndex != 99){
+		   return bufferPoolIndex;
+	   } else {
+		   return null;
+	   }
+   }
    
    /**
     * Returns the integer value at the specified offset of the

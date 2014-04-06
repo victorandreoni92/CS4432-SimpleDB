@@ -1,5 +1,7 @@
 package simpledb.buffer;
 
+import java.util.LinkedList;
+
 import simpledb.file.*;
 
 /**
@@ -10,6 +12,8 @@ import simpledb.file.*;
 class BasicBufferMgr {
    private Buffer[] bufferpool;
    private int numAvailable;
+   //CS4432-Project1: List to store available indexes of buffers
+   private LinkedList<Integer> availableBufferIndexes;
    
    /**
     * Creates a buffer manager having the specified number 
@@ -26,9 +30,13 @@ class BasicBufferMgr {
     */
    BasicBufferMgr(int numbuffs) {
       bufferpool = new Buffer[numbuffs];
+      availableBufferIndexes = new LinkedList<Integer>();
       numAvailable = numbuffs;
-      for (int i=0; i<numbuffs; i++)
-         bufferpool[i] = new Buffer();
+      for (int i=0; i<numbuffs; i++){
+         bufferpool[i] = new Buffer(i);
+         //CS4432-Project1: Add indexes into available buffer list
+         availableBufferIndexes.add(i);
+      }
    }
    
    /**
@@ -89,8 +97,16 @@ class BasicBufferMgr {
     */
    synchronized void unpin(Buffer buff) {
       buff.unpin();
-      if (!buff.isPinned())
+      if (!buff.isPinned()){
          numAvailable++;
+         
+         //CS4432-Project1: Get the index associated with the buffer
+         // and add it to the available pool if not null
+         Integer buffIndex = buff.getBufferPoolIndex();
+         if (buffIndex != null){
+        	 availableBufferIndexes.add(buffIndex);
+         }
+      }
    }
    
    /**
@@ -101,6 +117,7 @@ class BasicBufferMgr {
       return numAvailable;
    }
    
+   //CS4432-Project1: Method that looks for buffer with specified disk page 
    private Buffer findExistingBuffer(Block blk) {
       for (Buffer buff : bufferpool) {
          Block b = buff.block();
@@ -110,10 +127,23 @@ class BasicBufferMgr {
       return null;
    }
    
+   //CS4432-Project1: Method that checks for available buffers (frames)
    private Buffer chooseUnpinnedBuffer() {
-      for (Buffer buff : bufferpool)
-         if (!buff.isPinned())
-         return buff;
-      return null;
+	   
+	  //CS4432-Project1: Get first index in list, null if list empty
+	  Integer index = availableBufferIndexes.pollFirst();
+	  
+	  if (index != null){ //CS4432-Project1: If not null, get buffer in
+		  return bufferpool[index];//specified index
+	  } else {
+		  return null;
+	  }
    }
 }
+
+
+
+
+
+
+
