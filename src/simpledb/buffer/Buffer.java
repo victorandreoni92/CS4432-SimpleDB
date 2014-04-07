@@ -1,5 +1,7 @@
 package simpledb.buffer;
 
+import java.util.Date;
+
 import simpledb.server.SimpleDB;
 import simpledb.file.*;
 
@@ -17,7 +19,9 @@ public class Buffer {
    private Page contents = new Page();
    private Block blk = null;
    private int pins = 0;
+   private int ref = 0;
    private int modifiedBy = -1;  // negative means not modified
+   private Date lastModified;
    private int logSequenceNumber = -1; // negative means no corresponding log record
 
    /**
@@ -34,7 +38,9 @@ public class Buffer {
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
-   public Buffer() {}
+   public Buffer() {
+	   lastModified = new Date();
+   }
    
    /**
     * Returns the integer value at the specified offset of the
@@ -79,6 +85,7 @@ public class Buffer {
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
       contents.setInt(offset, val);
+      lastModified = new Date();
    }
 
    /**
@@ -100,6 +107,7 @@ public class Buffer {
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
       contents.setString(offset, val);
+      lastModified = new Date();
    }
 
    /**
@@ -129,14 +137,14 @@ public class Buffer {
    /**
     * Increases the buffer's pin count.
     */
-   void pin() {
+   public void pin() {
       pins++;
    }
 
    /**
     * Decreases the buffer's pin count.
     */
-   void unpin() {
+   public void unpin() {
       pins--;
    }
 
@@ -145,8 +153,38 @@ public class Buffer {
     * (that is, if it has a nonzero pin count).
     * @return true if the buffer is pinned
     */
-   boolean isPinned() {
+   public boolean isPinned() {
       return pins > 0;
+   }
+   
+   /***
+    * 
+    */
+   public void  setRef() {
+	   ref = 1;
+   }
+   
+   /***
+    * 
+    */
+   public void  unsetRef() {
+	   ref = 0;
+   }
+   
+   /***
+    * 
+    * @return
+    */
+   public boolean refBitSet() {
+	   return ref == 1;
+   }
+   
+   /***
+    * 
+    * @return
+    */
+   public Date getLastModifiedDate() {
+	   return lastModified;
    }
 
    /**
@@ -171,6 +209,7 @@ public class Buffer {
       blk = b;
       contents.read(blk);
       pins = 0;
+      lastModified = new Date();
    }
 
    /**
@@ -186,5 +225,6 @@ public class Buffer {
       fmtr.format(contents);
       blk = contents.append(filename);
       pins = 0;
+      lastModified = new Date();
    }
 }
