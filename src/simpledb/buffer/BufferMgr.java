@@ -39,6 +39,15 @@ public class BufferMgr {
       bufferMgr = new BasicBufferMgr(numbuffers);
    }
    
+   
+   /**
+    * CS4432-Project1: Returns the information for each buffer in the pool
+    * @return information about each buffer's id, block, and pin status
+    */
+   public String toString(){
+	   return bufferMgr.toString();
+   }
+   
    /**
     * Pins a buffer to the specified block, potentially
     * waiting until a buffer becomes available.
@@ -57,6 +66,12 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         
+         //CS4432-Project1: Print buffer pool after each pinning
+         System.out.println(toString());
+         for(int i = 60; i >= 0; i--){System.out.print("-");}
+         System.out.println("");
+         
          return buff;
       }
       catch(InterruptedException e) {

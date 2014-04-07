@@ -57,6 +57,18 @@ class BasicBufferMgr {
    }
    
    /**
+    * CS4432-Project1: Returns the information for each buffer in the pool
+    * @return information about each buffer's id, block, and pin status
+    */
+   public String toString(){
+	   String buffersInfo = new String();
+	   for (Buffer buff : bufferpool){
+		   buffersInfo += buff.toString() + System.getProperty("line.separator");
+	   }
+	   return buffersInfo;
+   }
+   
+   /**
     * Pins a buffer to the specified block. 
     * If there is already a buffer assigned to that block
     * then that buffer is used;  

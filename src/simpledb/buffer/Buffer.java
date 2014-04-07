@@ -64,6 +64,23 @@ public class Buffer {
    }
    
    /**
+    * CS4432-Project1: Returns the information of the buffer in a readable format
+    * @return information about the buffer's id, block, and pin status
+    */
+   public String toString(){
+	   String bufferInfo =  "Buffer ID: " + bufferPoolIndex + " Pin count: " + pins
+			   + " Allocated block: ";
+	   if (blk != null){
+		   bufferInfo += blk.toString();
+	   } else {
+		   bufferInfo += "No block assigned";
+	   }
+	   
+	   return bufferInfo;
+   }
+   
+   
+   /**
     * Returns the integer value at the specified offset of the
     * buffer's page.
     * If an integer was not stored at that location,
