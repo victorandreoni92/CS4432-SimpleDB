@@ -15,7 +15,7 @@ class BasicBufferMgr {
    private Buffer[] bufferpool;
    private int numAvailable;
    //CS4432-Project1: List to store available indexes of buffers
-   private LinkedList<Integer> availableBufferIndexes;
+   private LinkedList<Integer> freeBufferIndexes;
    //CS4432-Project1: HashTable to access requested frames with blocks
    // Key is the block number being searched, value is index into pool where
    // corresponding buffer is located
@@ -36,13 +36,16 @@ class BasicBufferMgr {
     */
    BasicBufferMgr(int numbuffs) {
       bufferpool = new Buffer[numbuffs];
-      availableBufferIndexes = new LinkedList<Integer>();
+      freeBufferIndexes = new LinkedList<Integer>();
       buffersOnPool = new Hashtable<Block, Integer>(numbuffs);
       numAvailable = numbuffs;
       for (int i=0; i<numbuffs; i++){
          bufferpool[i] = new Buffer(i);
-         //CS4432-Project1: Add indexes into available buffer list
-         availableBufferIndexes.add(i);
+         //CS4432-Project1: Add indexes into free buffer list
+         if (bufferpool[i].block() != null){ // make sure buffer is free, which must be the case
+        	 throw new BufferAbortException(); // If not free during pool creation, throw exception
+         }
+         freeBufferIndexes.add(i);  
       }
    }
    
@@ -122,13 +125,6 @@ class BasicBufferMgr {
       buff.unpin();
       if (!buff.isPinned()){
          numAvailable++;
-         
-         //CS4432-Project1: Get the index associated with the buffer
-         // and add it to the available pool if not null
-         Integer buffIndex = buff.getBufferPoolIndex();
-         if (buffIndex != null){
-        	 availableBufferIndexes.add(buffIndex);
-         }
       }
    }
    
@@ -157,13 +153,23 @@ class BasicBufferMgr {
    //CS4432-Project1: Method that checks for available buffers (frames)
    private Buffer chooseUnpinnedBuffer() {
 	   
-	  //CS4432-Project1: Get first index in list, null if list empty
-	  Integer index = availableBufferIndexes.pollFirst();
+	  //CS4432-Project1: Check first if there are empty buffers
+	  Integer index = freeBufferIndexes.pollFirst();
+	  
+	  if (index == null){ // No empty buffers, apply buffer selection policy
+		  //TODO Replace with proper replacement policy
+		  for (Buffer buff : bufferpool){
+			  if (! buff.isPinned()){
+				  index = buff.getBufferPoolIndex();
+			  }
+		  }
+	  }
 	  
 	  if (index != null){ //CS4432-Project1: If not null, get buffer in   
 	      Buffer buff = bufferpool[index];
 	      
-    	  //CS4432-Project1: Since block is being reused, remove reference
+    	  //CS4432-Project1: Since block is being reused, remove reference from buffersOnPool
+	      //Check that block is not null for buffers without assigned blocks
     	  //TODO Revise this when replacement policy is implemented
 	      if (buff.block() != null){
 	    	  buffersOnPool.remove(buff.block());

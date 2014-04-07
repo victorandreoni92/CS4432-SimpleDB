@@ -17,6 +17,8 @@ import simpledb.file.*;
  * excessive amount of time (currently, 10 seconds)
  * then a {@link BufferAbortException} is thrown.
  * @author Edward Sciore
+ * 
+ * @author Modified by Team21 for CS4432 at WPI
  */
 public class BufferMgr {
    private static final long MAX_TIME = 10000; // 10 seconds
