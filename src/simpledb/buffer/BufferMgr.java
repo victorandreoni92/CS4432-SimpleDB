@@ -138,4 +138,13 @@ public class BufferMgr {
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
    }
+   
+   /**
+    * CS4432-Project1: Function to set the replacement policy 
+    * @param policy the policy class to select (original simple policy, LRU, or Clock)
+    */
+   public static void setReplacementPolicy(Class policy) {
+		BasicBufferMgr.setReplacementPolicy(policy);
+	}
+   
 }

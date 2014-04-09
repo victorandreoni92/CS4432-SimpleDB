@@ -2,7 +2,7 @@ package simpledb.buffer;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
-
+import simpledb.buffer.replacementPolicy.*;
 import simpledb.file.*;
 
 /**
@@ -20,6 +20,8 @@ class BasicBufferMgr {
    // Key is the block number being searched, value is index into pool where
    // corresponding buffer is located
    private Hashtable<Block, Integer> buffersOnPool;
+   //CS4432-Project1: Variable indicating the replacement policy to use
+   static Class replacementPolicy = ClockPolicy.class;
    
    /**
     * Creates a buffer manager having the specified number 
@@ -93,6 +95,8 @@ class BasicBufferMgr {
       if (!buff.isPinned())
          numAvailable--;
       buff.pin();
+      //CS4432-Project1: Set reference bit to be used by clock replacement policy
+      buff.setRef();
       return buff;
    }
    
@@ -114,6 +118,8 @@ class BasicBufferMgr {
       buffersOnPool.put(buff.block(), buff.getBufferPoolIndex());
       numAvailable--;
       buff.pin();
+      //CS4432-Project1: Set reference bit to be used by clock replacement policy
+      buff.setRef();
       return buff;
    }
    
@@ -136,7 +142,11 @@ class BasicBufferMgr {
       return numAvailable;
    }
    
-   //CS4432-Project1: Method that looks for buffer with specified disk page 
+   /**
+    * CS4432-Project1: Method that looks for buffer with specified disk page 
+    * @param blk The block to look for in the pool
+    * @return The buffer if it is on the pool, null otherwise
+    */
    private Buffer findExistingBuffer(Block blk) {
       
 	  //CS4432-Project1: Get index for buffer with blk, null if not present
@@ -150,35 +160,53 @@ class BasicBufferMgr {
 	  }
    }
    
-   //CS4432-Project1: Method that checks for available buffers (frames)
+   /**
+    * CS4432-Project1: Method to retrieve an available buffer
+    * The method first looks for an empty frame by looking at the freeBufferIndexes list
+    * If there are no empty buffers, run the selected replacement policy to get a frame
+    * If no frame could be selected, return null so that threads can block of BufferManager
+    * @return
+    */
    private Buffer chooseUnpinnedBuffer() {
 	   
 	  //CS4432-Project1: Check first if there are empty buffers
 	  Integer index = freeBufferIndexes.pollFirst();
 	  
-	  if (index == null){ // No empty buffers, apply buffer selection policy
-		  //TODO Replace with proper replacement policy
-		  for (Buffer buff : bufferpool){
-			  if (! buff.isPinned()){
-				  index = buff.getBufferPoolIndex();
-			  }
+	  if (index == null){ // If there were no empty buffers, apply buffer selection policy
+		  try {
+			  index = ((ReplacementPolicy) replacementPolicy.newInstance()).chooseBufferForReplacement(bufferpool);
+		  } catch (Exception e) {
+			  e.printStackTrace();
+			  return null;
 		  }
 	  }
 	  
-	  if (index != null){ //CS4432-Project1: If not null, get buffer in   
+	  if (index != null){ //CS4432-Project1: If selection policy got a valid index, return buffer   
 	      Buffer buff = bufferpool[index];
 	      
     	  //CS4432-Project1: Since block is being reused, remove reference from buffersOnPool
 	      //Check that block is not null for buffers without assigned blocks
-    	  //TODO Revise this when replacement policy is implemented
 	      if (buff.block() != null){
 	    	  buffersOnPool.remove(buff.block());
 	      }
 	      
 		  return buff;
 	  } else {
-		  return null;
+		  return null; // If no frame selected, return null for caller to block
 	  }
    }
+   
+   /**
+    * CS4432-Project1: Function to set the replacement policy 
+    * @param policy the policy class to select (original simple policy, LRU, or Clock)
+    */
+   public static void setReplacementPolicy(Class policy) {
+		replacementPolicy = policy;
+	}
+
 }
+
+
+	
+	
 
