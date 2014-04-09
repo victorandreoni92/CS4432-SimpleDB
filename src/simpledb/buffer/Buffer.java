@@ -200,30 +200,30 @@ public class Buffer {
    }
    
    /***
-    * 
+    * CS4432-Project1: Sets the ref bit of the buffer - to be used by Clock replacement policy
     */
    public void  setRef() {
 	   ref = 1;
    }
    
    /***
-    * 
+    * CS4432-Project1: Unsets the ref bit of the buffer - to be used by Clock replacement policy
     */
    public void  unsetRef() {
 	   ref = 0;
    }
    
    /***
-    * 
-    * @return
+    * CS4432-Project1: Checkes whether the ref bit is set
+    * @return boolean indicating if the ref bit is set
     */
    public boolean refBitSet() {
 	   return ref == 1;
    }
    
    /***
-    * 
-    * @return
+    * CS4432-Project1: Returns the last modified date of a buffer
+    * @return the date of last modification for the buffer
     */
    public Date getLastModifiedDate() {
 	   return lastModified;

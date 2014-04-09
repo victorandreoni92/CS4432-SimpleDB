@@ -9,7 +9,7 @@ import simpledb.buffer.BufferMgr;
 import simpledb.buffer.replacementPolicy.*;
 
 /**
- * Sample Application Schema to test out SimpleDB with SQl Queries
+ * CS4432-Project1: Sample Application Schema to test out SimpleDB with SQl Queries
  * 
  * @author Team 21
  *

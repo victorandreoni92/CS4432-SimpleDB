@@ -4,6 +4,13 @@ import java.util.Date;
 
 import simpledb.buffer.Buffer;
 
+
+/**
+ * CS4432-Project1: LRU replacement policy to be used by buffer manager
+ * 
+ * @author Team 21
+ *
+ */
 public class LeastRecentlyUsedPolicy implements ReplacementPolicy {
 
 	@Override
