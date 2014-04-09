@@ -6,6 +6,10 @@ import simpledb.buffer.Buffer;
 /**
  * CS4432-Project1: Slightly modified original replacement policy. 
  * Left for reference and comparison
+ * 
+ * Method relies on the fact that there was a check to ensure that there was at least one
+ * unpinned buffer before calling this method.
+ * 
  * @author Team 21
  *
  */

@@ -173,11 +173,17 @@ class BasicBufferMgr {
 	  Integer index = freeBufferIndexes.pollFirst();
 	  
 	  if (index == null){ // If there were no empty buffers, apply buffer selection policy
-		  try {
-			  index = ((ReplacementPolicy) replacementPolicy.newInstance()).chooseBufferForReplacement(bufferpool);
-		  } catch (Exception e) {
-			  e.printStackTrace();
-			  return null;
+		  
+		  if (numAvailable == 0){ // First check if there are unpinned buffers.
+			  index = null; // If there are not, set index to null and do not run any replacement
+			  				// policy to make function more efficient
+		  } else {
+			  try {
+				  index = ((ReplacementPolicy) replacementPolicy.newInstance()).chooseBufferForReplacement(bufferpool);
+			  } catch (Exception e) {
+				  e.printStackTrace();
+				  return null;
+			  }
 		  }
 	  }
 	  

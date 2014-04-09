@@ -5,6 +5,9 @@ import simpledb.buffer.Buffer;
 /**
  * CS4432-Project1: Clock replacement policy to be used by buffer manager
  * 
+ * Method relies on the fact that there was a check to ensure that there was at least one
+ * unpinned buffer before calling this method.
+ * 
  * @author Team 21
  *
  */
