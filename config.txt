@@ -1,0 +1,2 @@
+ReplacementPolicy=simpledb.buffer.replacementPolicy.ClockPolicy
+TestBufferManager=Yes
