@@ -11,6 +11,8 @@ public interface ReplacementPolicy {
 	
 	/**
 	 * CS4432-Project1: selects an index in the given buffer pool for replacement
+	 * Interface is implemented by the different replacement policies for this assignment
+	 * LRU, Clock, and simple policy
 	 */
 	public int chooseBufferForReplacement( Buffer[] bufferPool );
 }

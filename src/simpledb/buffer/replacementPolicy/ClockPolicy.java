@@ -26,10 +26,10 @@ public class ClockPolicy implements ReplacementPolicy {
 		// Initial index of unpinned frame set to -1
 		int unpinnedBuffer = -1;
 
-		Buffer currentBuffer;
+		Buffer currentBuffer; // Maintain a reference to the current buffer
 		do {
-			currentBuffer = bufferPool[ clockPointer ];
-			if( !currentBuffer.isPinned() ) {
+			currentBuffer = bufferPool[ clockPointer ]; // Get each buffer while the hand moves
+			if( !currentBuffer.isPinned() ) { // If buffer not pinned but ref bit set, set the ref and move on to next buffer
 				if( currentBuffer.refBitSet() ) {
 					currentBuffer.unsetRef();
 				}
@@ -53,6 +53,6 @@ public class ClockPolicy implements ReplacementPolicy {
 			System.out.println( "^" );
 		}
 		
-		return unpinnedBuffer;
+		return unpinnedBuffer; // Return the index for the buffer that will be replaced
 	}
 }

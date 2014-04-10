@@ -1,8 +1,5 @@
 package simpledb.buffer.replacementPolicy;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import simpledb.buffer.Buffer;
 import simpledb.buffer.BufferMgr;
 
@@ -20,6 +17,8 @@ public class SimplePolicy implements ReplacementPolicy {
 
 	/**
 	 * CS4432-Project1: selects an index in the given buffer pool for replacement
+	 *Method relies on the fact that there was a check to ensure that there was at least one
+	 * unpinned buffer before calling this method.
 	 */
 	@Override
 	public int chooseBufferForReplacement(Buffer[] bufferPool) {
@@ -28,7 +27,7 @@ public class SimplePolicy implements ReplacementPolicy {
 		// CS4432-Project1: Loop only until first unpinned buffer is found
 		for( index = 0; index < bufferPool.length; index++ ) {
 			if (!bufferPool[ index ].isPinned())
-				break;
+				break; // If found a buffer, return immediatedly 
 		}
 
 		// CS4432-Project1: Print debugging information for testing purposes

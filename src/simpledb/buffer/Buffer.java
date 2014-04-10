@@ -131,6 +131,7 @@ public class Buffer {
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
       contents.setInt(offset, val);
+      //CS4432-Project1: Update last modified date to current time. Used by LRU policy
       lastModified = new Date();
    }
 
@@ -155,6 +156,7 @@ public class Buffer {
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
       contents.setString(offset, val);
+      //CS4432-Project1: Update last modified date to current time. Used by LRU policy
       lastModified = new Date();
    }
 
@@ -259,6 +261,7 @@ public class Buffer {
       blk = b;
       contents.read(blk);
       pins = 0;
+      //CS4432-Project1: Update last modified date to current time. Used by LRU policy
       lastModified = new Date();
    }
 
@@ -277,6 +280,7 @@ public class Buffer {
       fmtr.format(contents);
       blk = contents.append(filename);
       pins = 0;
+      //CS4432-Project1: Update last modified date to current time. Used by LRU policy
       lastModified = new Date();
    }
 }

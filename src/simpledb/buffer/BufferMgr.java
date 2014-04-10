@@ -150,7 +150,8 @@ public class BufferMgr {
    }
    
    /**
-    * CS4432-Project1: Used to get the debugging status from BasicBufferMgr
+    * CS4432-Project1: Used to get the debugging status from BasicBufferMgr when replacement
+    * policies are being executed
     * @return true if debugging is available
     */
    public static boolean debuggingEnabled() {

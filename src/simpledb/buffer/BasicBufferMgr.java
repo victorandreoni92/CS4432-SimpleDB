@@ -18,19 +18,16 @@ import java.util.Properties;
 class BasicBufferMgr {
    private Buffer[] bufferpool;
    private int numAvailable;
-   //CS4432-Project1: List to store available indexes of buffers
+   //CS4432-Project1: List to store available indexes of buffers. Used to find empty frames quickly.
    private LinkedList<Integer> freeBufferIndexes;
    //CS4432-Project1: HashTable to access requested frames with blocks
-   // Key is the block number being searched, value is index into pool where
-   // corresponding buffer is located
+   // Key is the block being searched, value is index into pool where
+   // corresponding buffer is located. Used to find buffers existing on pool.
    private Hashtable<Block, Integer> buffersOnPool;
-   
    // CS4432-Project1: added to keep track of the current replacement policy
    private ReplacementPolicy replacementPolicy;
-	
    // CS4432-Project1: If set to true, extra output is written to the console for testing and debugging purposes
    public static boolean TEST_BUFFER_MANAGER;
-   
    // CS4432-Project1: If set to true, extra output is written to the console for testing and debugging purposes
    public static boolean PRINT_BUFFER_MANAGER_CONTENTS;
    
@@ -49,30 +46,41 @@ class BasicBufferMgr {
     */
    BasicBufferMgr(int numbuffs) {
       bufferpool = new Buffer[numbuffs];
+      
+      //CS4432-Project1: Allocate the data structures being used by our modifications
       freeBufferIndexes = new LinkedList<Integer>();
       buffersOnPool = new Hashtable<Block, Integer>(numbuffs);
+      
       numAvailable = numbuffs;
       for (int i=0; i<numbuffs; i++){
          bufferpool[i] = new Buffer(i);
+         
          //CS4432-Project1: Add indexes into free buffer list
-         if (bufferpool[i].block() != null){ // make sure buffer is free, which must be the case
+         if (bufferpool[i].block() != null){ // Make sure buffer is free, which must be the case
         	 throw new BufferAbortException(); // If not free during pool creation, throw exception
          }
-         freeBufferIndexes.add(i);  
+         freeBufferIndexes.add(i);  // Add free buffers to the list
       }
       
-      // CS4432-Project1: Added to parse configuration file
+      // CS4432-Project1: Parse configuration file to obtain the replacement policy and the values
+      // for the debugging variables. See README and Design files for more details
 	  try {
 		  Properties props = new Properties();
-		  InputStream propertiesFile = new FileInputStream( "config.txt" );
+		  InputStream propertiesFile = new FileInputStream( "config.txt" ); // Read configuration file
 		  props.load( propertiesFile );
 		  propertiesFile.close();
+		  
+		  // Get the replacement policy
 		  replacementPolicy = (ReplacementPolicy) Class.forName( props.getProperty( "ReplacementPolicy", "ClockPolicy" ) ).newInstance();
+		  
+		  // Get the debugging variables
 		  TEST_BUFFER_MANAGER = props.getProperty( "TestBufferManager", "No" ).equals( "Yes" );
 		  PRINT_BUFFER_MANAGER_CONTENTS = props.getProperty( "PrintBufferManagerContents", "No" ).equals( "Yes" );
-	  } catch (Exception e) {
+		  
+	  } catch (Exception e) { // If an exception is thrown by a corrupt config file, assign default values
 		  replacementPolicy = new ClockPolicy();
 		  TEST_BUFFER_MANAGER = false;
+		  PRINT_BUFFER_MANAGER_CONTENTS = false;
 		  e.printStackTrace();
 	  }
       
@@ -95,7 +103,7 @@ class BasicBufferMgr {
    public String toString(){
 	   String buffersInfo = new String();
 	   for (Buffer buff : bufferpool){
-		   buffersInfo += buff.toString() + System.getProperty("line.separator");
+		   buffersInfo += buff.toString() + System.getProperty("line.separator"); // Use system newline
 	   }
 	   return buffersInfo;
    }
@@ -116,14 +124,18 @@ class BasicBufferMgr {
          if (buff == null)
             return null;
          buff.assignToBlock(blk);
-         //CS4432-Project1: Add reference to block in table
+         
+         //CS4432-Project1: Add reference to block in table for faster access in future calls to
+         // findExitingBuffer()
          buffersOnPool.put(blk, buff.getBufferPoolIndex());
       }
       if (!buff.isPinned())
          numAvailable--;
       buff.pin();
+      
       //CS4432-Project1: Set reference bit to be used by clock replacement policy
       buff.setRef();
+      
       return buff;
    }
    
@@ -141,12 +153,16 @@ class BasicBufferMgr {
       if (buff == null)
          return null;
       buff.assignToNew(filename, fmtr);
-      //CS4432-Project1: Add reference to block in table
+      
+      //CS4432-Project1: Add reference to block in table for faster access in future calls to
+      // findExitingBuffer()
       buffersOnPool.put(buff.block(), buff.getBufferPoolIndex());
       numAvailable--;
       buff.pin();
+      
       //CS4432-Project1: Set reference bit to be used by clock replacement policy
       buff.setRef();
+      
       return buff;
    }
    

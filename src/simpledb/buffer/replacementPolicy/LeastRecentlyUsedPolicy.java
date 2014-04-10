@@ -25,9 +25,9 @@ public class LeastRecentlyUsedPolicy implements ReplacementPolicy {
 	public int chooseBufferForReplacement(Buffer[] bufferPool) {
 		int index;
 		int leastRecentlyUsed = 0;
-		Date leastRecentlyUsedDate = bufferPool[0].getLastModifiedDate();
+		Date leastRecentlyUsedDate = bufferPool[0].getLastModifiedDate(); // Keep track of the least recently used time
 		
-		for( index = 0; index < bufferPool.length; index++ ) {
+		for( index = 0; index < bufferPool.length; index++ ) { // Loop through the pool and find the least recently used buffer
 			if( 	!bufferPool[ index ].isPinned() &&
 					bufferPool[ index ].getLastModifiedDate().before( leastRecentlyUsedDate ) ) {
 				leastRecentlyUsed = index;
@@ -44,7 +44,7 @@ public class LeastRecentlyUsedPolicy implements ReplacementPolicy {
 			System.out.println( " " );
 		}
 		
-		return leastRecentlyUsed;
+		return leastRecentlyUsed; // Return the index of the least recently used buffer
 	}
 
 }
