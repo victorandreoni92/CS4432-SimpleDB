@@ -38,6 +38,21 @@ public class SampleSchema {
 					"varchar(40), Colors varchar(30))";
 			statement.executeUpdate(query); // Create baseball teams table
 			
+			// Third table - Computers table
+			query = "create table Computers(ID int, Brand varchar(40), Color " +
+					"varchar(40), Price int)";
+			statement.executeUpdate(query); // Create computer table
+			
+			// Fourth table - Cars table
+			query = "create table Cars(ID int, Name varchar(40), Make " +
+					"varchar(40), Color varchar(30))";
+			statement.executeUpdate(query); // Create cars table
+			
+			// Fifth table - Colors table
+			query = "create table Colors(ID int, Name varchar(40), HEX " +
+					"varchar(40),  Liked varchar(4))";
+			statement.executeUpdate(query); // Create colors teams table
+			
 			// Populate soccer teams table
 			query = "insert into SoccerTeams(ID, Name, Country, Colors, League) values ";
 			String[] soccerTeams = {"(1, 'Juventus', 'Italy', 'White and Black', 'Serie A')",
@@ -66,6 +81,45 @@ public class SampleSchema {
 			// Loop through baseball teams array to fill table
 			for (int i = 0; i < baseballTeams.length; i++){
 				statement.executeUpdate(query + baseballTeams[i]);
+			}
+			
+			// Populate computers table
+			query = "insert into Computers(ID, Brand, Color, Price) values ";
+			String[] computers = {"(1, 'Dell', 'Black', 700)",
+									"(2, 'Apple', 'White', 2800)",
+									"(3, 'HP', 'Blue', 850)",
+									"(4, 'Asus', 'Black', 1200)",
+									"(5, 'Alienware', 'Black', 1850)"};
+
+			// Loop through soccer teams array to fill table
+			for (int i = 0; i < computers.length; i++){
+				statement.executeUpdate(query + computers[i]);
+			}
+			
+			// Populate cars table
+			query = "insert into Cars(ID, Name, Make, Color) values ";
+			String[] cars = {"(1, 'Camaro', 'Chevrolet', 'Yellow')",
+									"(2, 'Tacoma', 'Toyota', 'Blue')",
+									"(3, 'Evoque', 'Land Rover', 'White')",
+									"(4, 'Carrera', 'Porsche', 'Red')",
+									"(5, 'XF', 'Jaguar', 'Sand')"};
+
+			// Loop through soccer teams array to fill table
+			for (int i = 0; i < cars.length; i++){
+				statement.executeUpdate(query + cars[i]);
+			}
+			
+			// Populate cars table
+			query = "insert into Colors(ID, Name, HEX, Liked) values ";
+			String[] colors = {"(1, 'Blue', '00F', 'Yes')",
+									"(2, 'Green', '0F0', 'No')",
+									"(3, 'Red', 'F00', 'No')",
+									"(4, 'Yellow', 'FF0', 'Yes')",
+									"(5, 'White', 'FFF', 'Yes')"};
+
+			// Loop through soccer teams array to fill table
+			for (int i = 0; i < colors.length; i++){
+				statement.executeUpdate(query + colors[i]);
 			}
 			
 			/////////////////////// Query Tables and Print Results/////////////////////////////////
@@ -123,6 +177,79 @@ public class SampleSchema {
 			System.out.printf("\n%-15s\n\n", "Baseball teams with white uniforms");
 			while (results.next()) {
 				System.out.printf("%-15s\n", results.getString("Name"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
+			
+			// Fourth query - All computers in table
+			query = "select Brand, Color, Price " +
+					"from Computers";
+			results = statement.executeQuery(query);
+			
+			// Print results
+			System.out.println("\nAll computers in table");
+			System.out.printf("\n%-15s \t %-10s \t %-25s\n\n", "Brand", "Color",
+					"Price");
+			while (results.next()) {
+				System.out.printf("%-15s \t %-10s \t %-25d\n", 
+						results.getString("Brand"),
+						results.getString("Color"),
+						results.getInt("Price"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
+			
+			// Fifth query - All cars in table
+			query = "select Name, Make, Color " +
+					"from Cars";
+			results = statement.executeQuery(query);
+			
+			// Print results
+			System.out.println("\nAll cars in table");
+			System.out.printf("\n%-15s \t %-10s \t %-25s\n\n", "Name", "Make",
+					"Color");
+			while (results.next()) {
+				System.out.printf("%-15s \t %-10s \t %-25s\n", 
+						results.getString("Name"),
+						results.getString("Make"),
+						results.getString("Color"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
+			
+			// Sixth query - All colors in table			
+			query = "select Name, HEX, Liked " +
+					"from Colors";
+			results = statement.executeQuery(query);
+			
+			// Print results
+			System.out.println("\nAll colors in table");
+			System.out.printf("\n%-15s \t %-10s \t %-25s\n\n", "Name", "HEX",
+					"Liked");
+			while (results.next()) {
+				System.out.printf("%-15s \t %-10s \t %-25s\n", 
+						results.getString("Name"),
+						results.getString("HEX"),
+						results.getString("Liked"));
+			}
+			for(int i = 60; i >= 0; i--){System.out.print("-");}
+			results.close();
+			
+			// Seventh query - All soccer teams in table
+			query = "select Name, Country, Colors, League " +
+					"from SoccerTeams";
+			results = statement.executeQuery(query);
+			
+			// Print results
+			System.out.println("\nAll soccer teams in table");
+			System.out.printf("\n%-15s \t %-10s \t %-25s \t %-10s\n\n", "Team", "Country",
+					"Colors", "League");
+			while (results.next()) {
+				System.out.printf("%-15s \t %-10s \t %-25s \t %-10s\n", 
+						results.getString("Name"),
+						results.getString("Country"),
+						results.getString("Colors"),
+						results.getString("League"));
 			}
 			for(int i = 60; i >= 0; i--){System.out.print("-");}
 			results.close();
