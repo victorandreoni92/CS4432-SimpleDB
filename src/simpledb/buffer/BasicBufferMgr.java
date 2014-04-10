@@ -3,6 +3,10 @@ package simpledb.buffer;
 import simpledb.buffer.replacementPolicy.*;
 import simpledb.file.*;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Manages the pinning and unpinning of buffers to blocks.
  * @author Edward Sciore
@@ -11,7 +15,13 @@ import simpledb.file.*;
 public class BasicBufferMgr {
 	private Buffer[] bufferpool;
 	private int numAvailable;
-	static Class replacementPolicy = ClockPolicy.class;
+	
+	// CS4432-Project1: added to keep track of the current replacement policy
+	private ReplacementPolicy replacementPolicy;
+	
+	
+	// CS4432-Project1: If set to true, extra output is written to the console for testing and debugging purposes
+	public static boolean TEST_BUFFER_MANAGER;
 	
 	/**
 	* Creates a buffer manager having the specified number 
@@ -31,6 +41,20 @@ public class BasicBufferMgr {
 		numAvailable = numbuffs;
 		for (int i=0; i<numbuffs; i++)
 			bufferpool[i] = new Buffer();
+		
+		// CS4432-Project1: Added to parse configuration file
+		try {
+			Properties props = new Properties();
+			InputStream propertiesFile = new FileInputStream( "config.txt" );
+			props.load( propertiesFile );
+			propertiesFile.close();
+			replacementPolicy = (ReplacementPolicy) Class.forName( props.getProperty( "ReplacementPolicy", "ClockPolicy" ) ).newInstance();
+			TEST_BUFFER_MANAGER = props.getProperty( "TestBufferManager", "No" ).equals( "Yes" );
+		} catch (Exception e) {
+			replacementPolicy = new ClockPolicy();
+			TEST_BUFFER_MANAGER = false;
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -114,9 +138,9 @@ public class BasicBufferMgr {
 		return null;
 	}
 	
-	/***
-	* 
-	* @return
+	/**
+	* CS4432-Project1: Chooses a buffer for replacement using the policy contained in replacementPolicy
+	* @return a buffer to be replaced
 	*/
 	private Buffer chooseUnpinnedBuffer() {
 		
@@ -124,20 +148,8 @@ public class BasicBufferMgr {
 			return null;
 		}
 		
-		int bufferIndex;
-		try {
-			bufferIndex = ( (ReplacementPolicy) replacementPolicy.newInstance() ).chooseBufferForReplacement( bufferpool );
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-		System.out.println( "Choosing unpinned buffer " + bufferIndex );
+		int bufferIndex = replacementPolicy.chooseBufferForReplacement( bufferpool );
 	
 		return bufferpool[ bufferIndex ];
-	}
-	
-	public static void setReplacementPolicy( Class policy ) {
-		replacementPolicy = policy;
 	}
 }
