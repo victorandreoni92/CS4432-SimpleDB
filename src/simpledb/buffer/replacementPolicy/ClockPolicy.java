@@ -1,6 +1,7 @@
 package simpledb.buffer.replacementPolicy;
 
 import simpledb.buffer.Buffer;
+import simpledb.buffer.BufferMgr;
 
 /**
  * CS4432-Project1: Clock replacement policy to be used by buffer manager
@@ -14,29 +15,44 @@ import simpledb.buffer.Buffer;
 
 public class ClockPolicy implements ReplacementPolicy {
 	
-	// Pointer of current frame in clock hand
-	static private int clockPointer = 0;
+	// CS4432-Project1: keeps track of the position of the clock hand
+	private int clockPointer = 0;
 
+	/**
+	 * CS4432-Project1: selects an index in the given buffer pool for replacement
+	 */
 	@Override
 	public int chooseBufferForReplacement( Buffer[] bufferPool ) {		
 		// Initial index of unpinned frame set to -1
 		int unpinnedBuffer = -1;
 
+		Buffer currentBuffer;
 		do {
-			if( !bufferPool[ clockPointer ].isPinned() ) { // If frame not pinned
-				if( bufferPool[ clockPointer ].refBitSet() ) { // If ref bit is set, unset it
-					bufferPool[ clockPointer ].unsetRef();
+			currentBuffer = bufferPool[ clockPointer ];
+			if( !currentBuffer.isPinned() ) {
+				if( currentBuffer.refBitSet() ) {
+					currentBuffer.unsetRef();
 				}
 				else {
 					unpinnedBuffer = clockPointer; // If ref bit was not set, select this frame
 				}
 			}
-			
-			// Move clock hand pointer
-			ClockPolicy.clockPointer = ( clockPointer + 1 ) % bufferPool.length;
+			clockPointer = ( clockPointer + 1 ) % bufferPool.length;
 		} while( unpinnedBuffer == -1 );
 		
-		return unpinnedBuffer; // Return the index of the buffer to take
+		// CS4432-Project1: Print debugging information for testing purposes
+		if( BufferMgr.debuggingEnabled() ) {
+			System.out.println( "Selecting buffer " + unpinnedBuffer + " for replacement using Clock replacement policy.  Bufferpool:" );
+			for( int i = 0; i < bufferPool.length; i++ ) {
+				System.out.print( i + ( bufferPool[i].isPinned() ? bufferPool[i].refBitSet() ? "*+" : "* " : bufferPool[i].refBitSet() ? "+ " : "  " ) + " " );
+			}
+			System.out.println( " " );
+			for( int i = 0; i < clockPointer; i++ ) {
+				System.out.print( "    " );
+			}
+			System.out.println( "^" );
+		}
+		
+		return unpinnedBuffer;
 	}
-
 }

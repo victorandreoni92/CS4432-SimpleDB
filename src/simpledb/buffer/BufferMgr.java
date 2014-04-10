@@ -69,10 +69,12 @@ public class BufferMgr {
          if (buff == null)
             throw new BufferAbortException();
          
-         //CS4432-Project1: Print buffer pool after each pinning
-         System.out.println(toString());
-         for(int i = 60; i >= 0; i--){System.out.print("-");}
-         System.out.println("");
+         //CS4432-Project1: Print buffer pool after each pinning if enabled
+         if (BasicBufferMgr.PRINT_BUFFER_MANAGER_CONTENTS){
+	         System.out.println(toString());
+	         for(int i = 60; i >= 0; i--){System.out.print("-");}
+	         System.out.println("");
+         }
          
          return buff;
       }
@@ -100,6 +102,14 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         
+         //CS4432-Project1: Print buffer pool after each pinning if enabled
+         if (BasicBufferMgr.PRINT_BUFFER_MANAGER_CONTENTS){
+	         System.out.println(toString());
+	         for(int i = 60; i >= 0; i--){System.out.print("-");}
+	         System.out.println("");
+         }
+         
          return buff;
       }
       catch(InterruptedException e) {
@@ -140,11 +150,10 @@ public class BufferMgr {
    }
    
    /**
-    * CS4432-Project1: Function to set the replacement policy 
-    * @param policy the policy class to select (original simple policy, LRU, or Clock)
+    * CS4432-Project1: Used to get the debugging status from BasicBufferMgr
+    * @return true if debugging is available
     */
-   public static void setReplacementPolicy(Class policy) {
-		BasicBufferMgr.setReplacementPolicy(policy);
-	}
-   
+   public static boolean debuggingEnabled() {
+	   return BasicBufferMgr.TEST_BUFFER_MANAGER;
+   }
 }

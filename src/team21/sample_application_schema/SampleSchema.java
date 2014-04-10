@@ -4,10 +4,6 @@ import java.sql.*;
 
 import simpledb.remote.SimpleDriver;
 
-import simpledb.buffer.BufferMgr;
-
-import simpledb.buffer.replacementPolicy.*;
-
 /**
  * CS4432-Project1: Sample Application Schema to test out SimpleDB with SQl Queries
  * 
@@ -17,8 +13,6 @@ import simpledb.buffer.replacementPolicy.*;
 
 public class SampleSchema {
 	public static void main(String[] args){
-		
-		BufferMgr.setReplacementPolicy( LeastRecentlyUsedPolicy.class );
 		
 		Connection connection = null;
 

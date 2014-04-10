@@ -23,9 +23,9 @@ public class Buffer {
    private int pins = 0;
    //CS4432-Project1: Store index where buffer is allocated
    private int bufferPoolIndex;
-   private int ref = 0;
+   private int ref = 0; // CS4432-Project1: Added to represent the ref bit associated with this buffer
    private int modifiedBy = -1;  // negative means not modified
-   private Date lastModified;
+   private Date lastModified; // CS4432-Project1: Added to keep track of the date of last modification
    private int logSequenceNumber = -1; // negative means no corresponding log record
 
    /**
@@ -41,6 +41,8 @@ public class Buffer {
     * Thus this constructor cannot be called until 
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
+    * 
+    * CS4432-Project1: Constructing a new buffer initialized the date of last modification
     */
    public Buffer() {
 	   //CS4432-Project1: If no index is specified, add signal value for index
@@ -121,6 +123,8 @@ public class Buffer {
     * @param val the new integer value to be written
     * @param txnum the id of the transaction performing the modification
     * @param lsn the LSN of the corresponding log record
+    * 
+    * CS4432-Project1: This method updates the date of last modification
     */
    public void setInt(int offset, int val, int txnum, int lsn) {
       modifiedBy = txnum;
@@ -143,6 +147,8 @@ public class Buffer {
     * @param val the new string value to be written
     * @param txnum the id of the transaction performing the modification
     * @param lsn the LSN of the corresponding log record
+    * 
+    * CS4432-Project1: This method updates the date of last modification
     */
    public void setString(int offset, String val, int txnum, int lsn) {
       modifiedBy = txnum;
@@ -199,31 +205,31 @@ public class Buffer {
       return pins > 0;
    }
    
-   /***
-    * CS4432-Project1: Sets the ref bit of the buffer - to be used by Clock replacement policy
+   /**
+    * CS4432-Project1: Sets the reference bit of this buffer to 1
     */
-   public void  setRef() {
+   public void setRef() {
 	   ref = 1;
    }
    
-   /***
-    * CS4432-Project1: Unsets the ref bit of the buffer - to be used by Clock replacement policy
+    /** CS4432-Project1: Sets the reference bit of this buffer to 0
+     * 
     */
-   public void  unsetRef() {
+   public void unsetRef() {
 	   ref = 0;
    }
    
-   /***
-    * CS4432-Project1: Checks whether the ref bit is set
-    * @return boolean indicating if the ref bit is set
+   /**
+    * CS4432-Project1:
+    * @return true if the reference bit of this buffer is set to 1
     */
    public boolean refBitSet() {
 	   return ref == 1;
    }
    
-   /***
+   /**
     * CS4432-Project1: Returns the last modified date of a buffer
-    * @return the date of last modification for the buffer
+    * @return the date of last modification
     */
    public Date getLastModifiedDate() {
 	   return lastModified;
@@ -245,6 +251,8 @@ public class Buffer {
     * If the buffer was dirty, then the contents
     * of the previous page are first written to disk.
     * @param b a reference to the data block
+    * 
+    * CS4432-Project1: This method updates the date of last modification
     */
    void assignToBlock(Block b) {
       flush();
@@ -261,6 +269,8 @@ public class Buffer {
     * of the previous page are first written to disk.
     * @param filename the name of the file
     * @param fmtr a page formatter, used to initialize the page
+    * 
+    * CS4432-Project1: This method updates the date of last modification
     */
    void assignToNew(String filename, PageFormatter fmtr) {
       flush();

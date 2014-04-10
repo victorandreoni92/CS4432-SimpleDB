@@ -5,6 +5,10 @@ import java.util.LinkedList;
 import simpledb.buffer.replacementPolicy.*;
 import simpledb.file.*;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Manages the pinning and unpinning of buffers to blocks.
  * @author Edward Sciore
@@ -20,8 +24,15 @@ class BasicBufferMgr {
    // Key is the block number being searched, value is index into pool where
    // corresponding buffer is located
    private Hashtable<Block, Integer> buffersOnPool;
-   //CS4432-Project1: Variable indicating the replacement policy to use
-   static Class replacementPolicy = ClockPolicy.class;
+   
+   // CS4432-Project1: added to keep track of the current replacement policy
+   private ReplacementPolicy replacementPolicy;
+	
+   // CS4432-Project1: If set to true, extra output is written to the console for testing and debugging purposes
+   public static boolean TEST_BUFFER_MANAGER;
+   
+   // CS4432-Project1: If set to true, extra output is written to the console for testing and debugging purposes
+   public static boolean PRINT_BUFFER_MANAGER_CONTENTS;
    
    /**
     * Creates a buffer manager having the specified number 
@@ -49,6 +60,22 @@ class BasicBufferMgr {
          }
          freeBufferIndexes.add(i);  
       }
+      
+      // CS4432-Project1: Added to parse configuration file
+	  try {
+		  Properties props = new Properties();
+		  InputStream propertiesFile = new FileInputStream( "config.txt" );
+		  props.load( propertiesFile );
+		  propertiesFile.close();
+		  replacementPolicy = (ReplacementPolicy) Class.forName( props.getProperty( "ReplacementPolicy", "ClockPolicy" ) ).newInstance();
+		  TEST_BUFFER_MANAGER = props.getProperty( "TestBufferManager", "No" ).equals( "Yes" );
+		  PRINT_BUFFER_MANAGER_CONTENTS = props.getProperty( "PrintBufferManagerContents", "No" ).equals( "Yes" );
+	  } catch (Exception e) {
+		  replacementPolicy = new ClockPolicy();
+		  TEST_BUFFER_MANAGER = false;
+		  e.printStackTrace();
+	  }
+      
    }
    
    /**
@@ -178,12 +205,7 @@ class BasicBufferMgr {
 			  index = null; // If there are not, set index to null and do not run any replacement
 			  				// policy to make function more efficient
 		  } else {
-			  try {
-				  index = ((ReplacementPolicy) replacementPolicy.newInstance()).chooseBufferForReplacement(bufferpool);
-			  } catch (Exception e) {
-				  e.printStackTrace();
-				  return null;
-			  }
+			  index = replacementPolicy.chooseBufferForReplacement(bufferpool);
 		  }
 	  }
 	  
@@ -201,18 +223,4 @@ class BasicBufferMgr {
 		  return null; // If no frame selected, return null for caller to block
 	  }
    }
-   
-   /**
-    * CS4432-Project1: Function to set the replacement policy 
-    * @param policy the policy class to select (original simple policy, LRU, or Clock)
-    */
-   public static void setReplacementPolicy(Class policy) {
-		replacementPolicy = policy;
-	}
-
 }
-
-
-	
-	
-
