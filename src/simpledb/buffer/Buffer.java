@@ -214,7 +214,7 @@ public class Buffer {
    }
    
    /***
-    * CS4432-Project1: Checkes whether the ref bit is set
+    * CS4432-Project1: Checks whether the ref bit is set
     * @return boolean indicating if the ref bit is set
     */
    public boolean refBitSet() {
