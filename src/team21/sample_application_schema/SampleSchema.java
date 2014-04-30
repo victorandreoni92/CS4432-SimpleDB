@@ -91,7 +91,7 @@ public class SampleSchema {
 									"(4, 'Asus', 'Black', 1200)",
 									"(5, 'Alienware', 'Black', 1850)"};
 
-			// Loop through soccer teams array to fill table
+			// Loop through computers array to fill table
 			for (int i = 0; i < computers.length; i++){
 				statement.executeUpdate(query + computers[i]);
 			}
@@ -104,12 +104,12 @@ public class SampleSchema {
 									"(4, 'Carrera', 'Porsche', 'Red')",
 									"(5, 'XF', 'Jaguar', 'Sand')"};
 
-			// Loop through soccer teams array to fill table
+			// Loop through cars array to fill table
 			for (int i = 0; i < cars.length; i++){
 				statement.executeUpdate(query + cars[i]);
 			}
 			
-			// Populate cars table
+			// Populate colors table
 			query = "insert into Colors(ID, Name, HEX, Liked) values ";
 			String[] colors = {"(1, 'Blue', '00F', 'Yes')",
 									"(2, 'Green', '0F0', 'No')",
@@ -117,7 +117,7 @@ public class SampleSchema {
 									"(4, 'Yellow', 'FF0', 'Yes')",
 									"(5, 'White', 'FFF', 'Yes')"};
 
-			// Loop through soccer teams array to fill table
+			// Loop through colors array to fill table
 			for (int i = 0; i < colors.length; i++){
 				statement.executeUpdate(query + colors[i]);
 			}
